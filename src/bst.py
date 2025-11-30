@@ -1,7 +1,8 @@
 class No:
-    def __init__(self, id, valor):
+    def __init__(self, id, valor, dado_extra=None):
         self.id = id
         self.valor = valor
+        self.dado_extra = dado_extra
         self.esquerda = None
         self.direita = None
 
@@ -10,26 +11,26 @@ class BST:
         self.raiz = None
         self.comparacoes = 0
 
-    def inserir(self, id, valor):
+    def inserir(self, id, valor, dado_extra=None):
         self.comparacoes = 0
         if self.raiz is None:
-            self.raiz = No(id, valor)
+            self.raiz = No(id, valor, dado_extra)
         else:
-            self._inserir_recursivo(self.raiz, id, valor)
+            self._inserir_recursivo(self.raiz, id, valor, dado_extra)
         return self.comparacoes
 
-    def _inserir_recursivo(self, no, id, valor):
+    def _inserir_recursivo(self, no, id, valor, dado_extra):
         self.comparacoes += 1
         if id < no.id:
             if no.esquerda is None:
-                no.esquerda = No(id, valor)
+                no.esquerda = No(id, valor, dado_extra)
             else:
-                self._inserir_recursivo(no.esquerda, id, valor)
+                self._inserir_recursivo(no.esquerda, id, valor, dado_extra)
         elif id > no.id:
             if no.direita is None:
-                no.direita = No(id, valor)
+                no.direita = No(id, valor, dado_extra)
             else:
-                self._inserir_recursivo(no.direita, id, valor)
+                self._inserir_recursivo(no.direita, id, valor, dado_extra)
         # IDs duplicados são ignorados
 
     def buscar(self, id):

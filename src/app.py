@@ -5,16 +5,25 @@ from avl import ArvoreAVL
 from rbt import ArvoreRubroNegra
 import random
 import string
+from utils import gerar_dados_aleatorios, gerar_dados_ordenados, gerar_string_aleatoria, gerar_valor_numerico
 import pandas as pd
+import time
 
 st.set_page_config(page_title="Estruturas de Dados - Apresentação", layout="wide")
 
 # --- BARRA LATERAL (SIDEBAR) ---
+# --- BARRA LATERAL (SIDEBAR) ---
 with st.sidebar:
+    # Título Condicional (Baseado no estado anterior ou padrão)
+    modo_atual = st.session_state.get("modo_selecionado", "Apresentação (Slides)")
+    if modo_atual == "Apresentação (Slides)":
+        st.title("🌲 Comparação de Árvores")
+        st.markdown("---")
+
     st.header("🎮 Painel de Controle")
     
     # Seleção de Modo
-    modo = st.radio("Modo de Acesso:", ["Apresentação (Slides)", "Playground Interativo"])
+    modo = st.radio("Modo de Acesso:", ["Apresentação (Slides)", "Playground Interativo"], key="modo_selecionado")
     st.markdown("---")
 
     # Controles do Playground (Só aparecem no modo Playground)
@@ -29,6 +38,10 @@ with st.sidebar:
             st.session_state.avl = ArvoreAVL()
         if "rbt" not in st.session_state:
             st.session_state.rbt = ArvoreRubroNegra()
+        
+        # Inicializar contador de ID
+        if "next_id" not in st.session_state:
+            st.session_state.next_id = 1
 
         # Selecionar a árvore atual
         if tipo_arvore == "BST":
@@ -44,20 +57,37 @@ with st.sidebar:
         tab_add, tab_rem, tab_search, tab_view, tab_conf = st.tabs(["➕ Inserir", "➖ Remover", "🔎 Buscar", "👀 Ver", "⚙️ Config"])
         
         with tab_add:
+
+            usar_auto_id = st.checkbox("Gerar ID Automaticamente?", value=False)
+            
             with st.form("form_inserir"):
-                col_id, col_val = st.columns([1, 2])
+                col_id, col_val, col_extra = st.columns([1, 2, 1])
                 with col_id:
-                    id_inserir = st.number_input("ID (Chave)", value=0, step=1)
+                    if usar_auto_id:
+                        id_inserir = st.session_state.next_id
+                        st.text_input("ID (Auto)", value=str(id_inserir), disabled=True)
+                    else:
+                        id_inserir = st.number_input("ID (Chave)", value=0, step=1)
                 with col_val:
-                    valor_inserir = st.text_input("Valor (Texto)", placeholder="Ex: Cliente A")
+                    valor_inserir = st.text_input("Valor (Texto/Num)", placeholder="Ex: 100")
+                with col_extra:
+                    extra_inserir = st.text_input("Categoria (Opcional)", placeholder="Ex: VIP")
                 
                 btn_inserir = st.form_submit_button("Adicionar Nó", type="primary")
                 
                 if btn_inserir:
                     # Lógica para valor padrão se vazio
-                    valor_final = valor_inserir if valor_inserir.strip() else obter_string_aleatoria()
-                    arvore.inserir(int(id_inserir), valor_final)
-                    st.success(f"✅ Nó {id_inserir} ({valor_final}) inserido!")
+                    valor_final = valor_inserir if valor_inserir.strip() else gerar_valor_numerico()
+                    extra_final = extra_inserir if extra_inserir.strip() else None
+                    
+                    arvore.inserir(int(id_inserir), valor_final, extra_final)
+                    
+                    # Incrementar ID se foi automático
+                    if usar_auto_id:
+                        st.session_state.next_id += 1
+
+                    msg_extra = f" | Cat: {extra_final}" if extra_final else ""
+                    st.success(f"✅ Nó {id_inserir} ({valor_final}{msg_extra}) inserido!")
                     st.rerun()
 
         with tab_rem:
@@ -86,8 +116,17 @@ with st.sidebar:
                 if btn_buscar:
                     if tipo_busca == "Por ID (Chave)":
                         resultado = arvore.buscar(int(id_buscar))
-                        if resultado:
-                            st.success(f"✅ Encontrado! ID: {resultado.id} | Valor: {resultado.valor}")
+                        
+                        # Tratamento para retorno (nó, comparações) ou apenas nó
+                        no_encontrado = None
+                        if isinstance(resultado, tuple):
+                            no_encontrado = resultado[0]
+                        else:
+                            no_encontrado = resultado
+
+                        if no_encontrado:
+                            dado_extra_str = f" | Categoria: {no_encontrado.dado_extra}" if getattr(no_encontrado, 'dado_extra', None) else ""
+                            st.success(f"✅ Encontrado! ID: {no_encontrado.id} | Valor: {no_encontrado.valor}{dado_extra_str}")
                         else:
                             st.error(f"❌ Nó com ID {id_buscar} não encontrado.")
                     else:
@@ -167,7 +206,8 @@ with st.sidebar:
 
 # --- CORPO PRINCIPAL ---
 if modo == "Apresentação (Slides)":
-    st.title("🌲 Comparação de Árvores de Busca")
+    # st.title("🌲 Comparação de Árvores de Busca") # Movido para sidebar
+
     
     # Controle de Slides (Lógica mantida para referência, mas controle visual movido para sidebar)
     if 'slide_index' not in st.session_state:
@@ -188,7 +228,7 @@ if modo == "Apresentação (Slides)":
     # Conteúdo dos Slides
     slide_atual = slides[st.session_state.slide_index]
     
-    st.markdown("---")
+    # st.markdown("---") # Removido para ganhar espaço
 
     if slide_atual == "Introdução":
         st.header("Estruturas de Dados Avançadas")
@@ -237,8 +277,16 @@ if modo == "Apresentação (Slides)":
                 *   **Pior:** O(n) - Árvore degenerada (lista ligada).
                 """)
             with col_img:
+
                 st.warning("Visualização do Pior Caso da BST:")
+                st.markdown("Se inserirmos dados ordenados (1, 2, 3, 4, 5), a BST vira uma **Lista Ligada**.")
                 dot = graphviz.Digraph()
+                dot.attr(rankdir='TB')
+                dot.node('1', '1')
+                dot.node('2', '2')
+                dot.node('3', '3')
+                dot.node('4', '4')
+                dot.node('5', '5')
                 dot.edge('1', '2')
                 dot.edge('2', '3')
                 dot.edge('3', '4')
@@ -273,15 +321,21 @@ if modo == "Apresentação (Slides)":
             with col_txt:
                 st.markdown("""
                 **Introdução Teórica:**
-                A AVL introduz o conceito de **Altura** e **Fator de Balanceamento** para evitar o pior caso da BST.
+                A AVL (criada por Adelson-Velsky e Landis em 1962) foi a primeira árvore binária de busca auto-balanceável.
                 
-                **Diferencial:**
-                *   A cada inserção/remoção, verificamos se `|Alt(Esq) - Alt(Dir)| <= 1`.
-                *   Se violar, aplicamos **Rotações** (Simples ou Dupla).
+                **O Conceito de Equilíbrio:**
+                *   **Fator de Balanceamento (FB):** Para cada nó, calculamos `Altura(Esq) - Altura(Dir)`.
+                *   **Regra:** O FB deve ser sempre **-1, 0 ou +1**.
+                *   Se o FB for **+2 ou -2**, a árvore está desbalanceada e precisa de correção.
                 
-                **Análise de Complexidade:**
-                *   **Todas as operações:** O(log n) garantido.
-                *   Custo extra de memória para armazenar a altura em cada nó.
+                **As 4 Rotações de Correção:**
+                1.  **Rotação Simples à Direita (LL):** Quando o desequilíbrio é na esquerda-esquerda.
+                2.  **Rotação Simples à Esquerda (RR):** Quando o desequilíbrio é na direita-direita.
+                3.  **Rotação Dupla à Direita (LR):** Esquerda depois Direita.
+                4.  **Rotação Dupla à Esquerda (RL):** Direita depois Esquerda.
+                
+                **Custo:**
+                Mantém a altura em **O(log n)**, garantindo buscas rápidas, mas as rotações na inserção/remoção têm um pequeno custo constante extra.
                 """)
             with col_img:
                 st.success("Exemplo de Balanceamento:")
@@ -323,16 +377,20 @@ if modo == "Apresentação (Slides)":
             with col_txt:
                 st.markdown("""
                 **Introdução Teórica:**
-                Usa **Cores (Vermelho/Preto)** como metadados para balanceamento. É menos rígida que a AVL, permitindo caminhos até 2x mais longos que o menor, mas isso reduz a necessidade de rotações em cascata.
+                A Árvore Rubro-Negra (Red-Black Tree) é uma estrutura mais pragmática. Ela não busca o equilíbrio perfeito (como a AVL), mas um equilíbrio "bom o suficiente" para garantir O(log n).
                 
-                **Regras de Ouro:**
-                1.  Raiz é Preta.
-                2.  Nó Vermelho só tem filhos Pretos.
-                3.  Todo caminho até uma folha tem o mesmo nº de nós Pretos.
+                **Como funciona?**
+                Cada nó tem uma cor (🔴 ou ⚫). As regras de coloração garantem que o caminho mais longo da raiz até uma folha não seja mais que o dobro do caminho mais curto.
                 
-                **Análise de Complexidade:**
-                *   **Busca/Inserção/Remoção:** O(log n).
-                *   Constante menor para inserções que a AVL.
+                **As 5 Propriedades (Regras):**
+                1.  Todo nó é **Vermelho** ou **Preto**.
+                2.  A **Raiz** é sempre **Preta**.
+                3.  Todas as folhas (NIL) são **Pretas**.
+                4.  Se um nó é **Vermelho**, seus filhos DEVEM ser **Pretos** (não pode haver vermelhos consecutivos).
+                5.  Todo caminho de um nó até suas folhas descendentes deve ter o mesmo número de nós **Pretos**.
+                
+                **Vantagem:**
+                Exige menos rotações que a AVL nas operações de escrita (inserção/remoção), sendo muito usada em bancos de dados e sistemas de arquivos.
                 """)
             with col_img:
                 st.error("Visualização das Cores:")
@@ -509,18 +567,7 @@ else:
     st.title(f"🌲 Playground: {tipo_arvore}")
     st.caption("Visualize e manipule a estrutura da árvore em tempo real.")
 
-    # CSS Hack para fixar altura do container do gráfico
-    st.markdown(
-        """
-        <style>
-        div[data-testid="stGraphVizChart"] > svg {
-            height: calc(100vh - 250px) !important;
-            width: 100% !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+
 
     # Função de visualização (Reutilizada)
     def obter_dot_graphviz(raiz_arvore, tipo_arvore):

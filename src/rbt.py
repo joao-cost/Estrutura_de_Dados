@@ -1,7 +1,8 @@
 class No:
-    def __init__(self, id, valor, cor="VERMELHO"):
+    def __init__(self, id, valor, dado_extra=None, cor="VERMELHO"):
         self.id = id
         self.valor = valor
+        self.dado_extra = dado_extra
         self.esquerda = None
         self.direita = None
         self.pai = None
@@ -33,9 +34,9 @@ class ArvoreRubroNegra:
         else:
             return self._buscar_recursivo(no.direita, id)
 
-    def inserir(self, id, valor):
+    def inserir(self, id, valor, dado_extra=None):
         self.comparacoes = 0
-        no = No(id, valor)
+        no = No(id, valor, dado_extra)
         no.pai = None
         no.id = id
         no.esquerda = self.NULO

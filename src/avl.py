@@ -1,7 +1,8 @@
 class NoAVL:
-    def __init__(self, id, valor):
+    def __init__(self, id, valor, dado_extra=None):
         self.id = id
         self.valor = valor
+        self.dado_extra = dado_extra
         self.esquerda = None
         self.direita = None
         self.altura = 1
@@ -48,20 +49,20 @@ class ArvoreAVL:
 
         return y
 
-    def inserir(self, id, valor):
+    def inserir(self, id, valor, dado_extra=None):
         self.comparacoes = 0
-        self.raiz = self._inserir_recursivo(self.raiz, id, valor)
+        self.raiz = self._inserir_recursivo(self.raiz, id, valor, dado_extra)
         return self.comparacoes
 
-    def _inserir_recursivo(self, no, id, valor):
+    def _inserir_recursivo(self, no, id, valor, dado_extra):
         self.comparacoes += 1
         if not no:
-            return NoAVL(id, valor)
+            return NoAVL(id, valor, dado_extra)
         
         if id < no.id:
-            no.esquerda = self._inserir_recursivo(no.esquerda, id, valor)
+            no.esquerda = self._inserir_recursivo(no.esquerda, id, valor, dado_extra)
         elif id > no.id:
-            no.direita = self._inserir_recursivo(no.direita, id, valor)
+            no.direita = self._inserir_recursivo(no.direita, id, valor, dado_extra)
         else:
             return no # Chaves duplicadas não permitidas
 
