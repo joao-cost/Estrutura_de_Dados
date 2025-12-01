@@ -12,7 +12,6 @@ import time
 st.set_page_config(page_title="Estruturas de Dados - Apresentação", layout="wide")
 
 # --- BARRA LATERAL (SIDEBAR) ---
-# --- BARRA LATERAL (SIDEBAR) ---
 with st.sidebar:
     # Título Condicional (Baseado no estado anterior ou padrão)
     modo_atual = st.session_state.get("modo_selecionado", "Apresentação (Slides)")
@@ -181,6 +180,7 @@ with st.sidebar:
             
         slides = [
             "Introdução",
+            "Desmistificando Big O",
             "Árvore Binária de Busca (BST)",
             "Árvore AVL",
             "Árvore Rubro-Negra",
@@ -215,6 +215,7 @@ if modo == "Apresentação (Slides)":
     
     slides = [
         "Introdução",
+        "Desmistificando Big O",
         "Árvore Binária de Busca (BST)",
         "Árvore AVL",
         "Árvore Rubro-Negra",
@@ -254,6 +255,50 @@ if modo == "Apresentação (Slides)":
         ### Objetivo do Trabalho
         Implementar do zero (Python), testar e comparar o desempenho dessas estruturas.
         """)
+
+    elif slide_atual == "Desmistificando Big O":
+        st.header("🧐 O que é esse tal de Big O?")
+        st.subheader("Uma explicação para humanos (sem matematiquês)")
+
+        col_analogia, col_arvore = st.columns(2)
+        
+        with col_analogia:
+            st.markdown("### 🎲 O Jogo da Adivinhação")
+            st.info("Imagine que eu pensei em um número de **1 a 100**.")
+            
+            st.markdown("**Estratégia 1: O(n) - Linear**")
+            st.write("Você chuta: 1, 2, 3, 4, 5...")
+            st.error("Se o número for 100, você fará **100 perguntas**! 😫")
+            
+            st.markdown("---")
+            
+            st.markdown("**Estratégia 2: O(log n) - Logarítmica**")
+            st.write("Você chuta: 50. Eu digo 'Maior'.")
+            st.write("Você chuta: 75. Eu digo 'Menor'.")
+            st.write("Você chuta: 62...")
+            st.success("Você elimina **metade** das opções a cada chute. Em no máximo **7 perguntas** você acerta! ⚡")
+
+        with col_arvore:
+            st.markdown("### 🌲 O que isso tem a ver com Árvores?")
+            st.markdown("""
+            *   **O(n)** é o que acontece na **BST** quando ela vira uma linha (lista ligada). Para achar o último nó, você precisa passar por todos.
+            *   **O(log n)** é o que acontece na **AVL** e **Rubro-Negra**. Como elas são balanceadas, cada comparação (ir para esquerda ou direita) elimina **metade** da árvore restante.
+            """)
+            
+            st.markdown("#### Visualmente:")
+            st.code("""
+            O(n) - BST Pior Caso      O(log n) - AVL/RBT
+            
+            1                         4
+             \\                      / \\
+              2                    2   6
+               \\                  / \\ / \\
+                3                1  3 5  7
+                 \\
+                  4
+            
+            (4 passos p/ achar o 4)   (2 passos p/ achar qualquer um)
+            """)
 
     elif slide_atual == "Árvore Binária de Busca (BST)":
         st.header("1. Árvore Binária de Busca (BST)")
@@ -507,27 +552,27 @@ if modo == "Apresentação (Slides)":
                     
                     with col_t1:
                         st.caption("Inserção")
-                        st.bar_chart(df_filtrado, x="Arvore", y="Tempo Insercao (ms)", color="Tipo de Dado")
+                        st.bar_chart(df_filtrado, x="Árvore", y="Tempo Inserção (ms)", color="Tipo de Dado")
                     with col_t2:
                         st.caption("Busca")
-                        st.bar_chart(df_filtrado, x="Arvore", y="Tempo Busca (ms)", color="Tipo de Dado")
+                        st.bar_chart(df_filtrado, x="Árvore", y="Tempo Busca (ms)", color="Tipo de Dado")
                     with col_t3:
                         st.caption("Remoção")
-                        st.bar_chart(df_filtrado, x="Arvore", y="Tempo Remocao (ms)", color="Tipo de Dado")
+                        st.bar_chart(df_filtrado, x="Árvore", y="Tempo Remoção (ms)", color="Tipo de Dado")
 
                     # Gráficos de Comparações
                     st.subheader("🔍 Comparações Médias")
-                    st.bar_chart(df_filtrado, x="Arvore", y=["Comparacoes Medias Insercao", "Comparacoes Medias Busca"], color=["#FF5733", "#33FF57"])
+                    st.bar_chart(df_filtrado, x="Árvore", y=["Comparações Médias Inserção", "Comparações Médias Busca"], color=["#FF5733", "#33FF57"])
 
                     # Métricas Estruturais
                     st.subheader("📏 Estrutura da Árvore")
                     col_e1, col_e2 = st.columns(2)
                     with col_e1:
                         st.caption("Altura Final")
-                        st.bar_chart(df_filtrado, x="Arvore", y="Altura Final", color="Tipo de Dado")
+                        st.bar_chart(df_filtrado, x="Árvore", y="Altura Final", color="Tipo de Dado")
                     with col_e2:
                         st.caption("Rotações (Total)")
-                        st.bar_chart(df_filtrado, x="Arvore", y="Rotacoes", color="Tipo de Dado")
+                        st.bar_chart(df_filtrado, x="Árvore", y="Rotações", color="Tipo de Dado")
 
                 except Exception as e:
                     st.error(f"Erro ao renderizar gráficos (Provável incompatibilidade de versões): {e}")

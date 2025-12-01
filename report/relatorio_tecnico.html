@@ -1,0 +1,102 @@
+
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+            h1 { color: #2c3e50; border-bottom: 2px solid #eee; }
+            h2 { color: #34495e; margin-top: 30px; }
+            h3 { color: #7f8c8d; }
+            table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            code { background-color: #f8f9fa; padding: 2px 5px; border-radius: 3px; font-family: Consolas, monospace; }
+            pre { background-color: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+            ul { margin-bottom: 20px; }
+            li { margin-bottom: 5px; }
+        </style>
+    </head>
+    <body>
+    <h1>Relatório Técnico: Comparação de Árvores de Busca (BST, AVL, Rubro-Negra)</h1>
+<p><b>Disciplina:</b> Estrutura de Dados</p>
+<p><b>Integrantes:</b></p>
+<ul><li>  Fellipe Melhoranca B. Tomasella</li></ul>
+<ul><li>  Inglid Pablina de A. Sandeski</li></ul>
+<ul><li>  João Vitor de S. Costa</li></ul>
+<ul><li>  Vitor Linsbinski de Oliveira</li></ul>
+<hr>
+<h2>1. Introdução Teórica</h2>
+<p>As árvores de busca são estruturas de dados fundamentais para o armazenamento e recuperação eficiente de informações. Este trabalho analisa três variações:</p>
+<h3>1.1. Árvore Binária de Busca (BST)</h3>
+<p>A estrutura base onde cada nó possui até dois filhos. A propriedade fundamental é que todos os nós à esquerda possuem valores menores que a raiz, e todos à direita, valores maiores. Embora simples, não possui mecanismos de balanceamento, podendo degenerar para uma lista encadeada (O(n)) no pior caso.</p>
+<h3>1.2. Árvore AVL (Adelson-Velsky e Landis)</h3>
+<p>Uma árvore binária de busca <b>auto-balanceável</b>. Ela mantém a altura controlada através do <b>Fator de Balanceamento</b> (diferença de altura entre subárvores esquerda e direita), que deve ser sempre -1, 0 ou 1. Se esse fator for violado após uma inserção ou remoção, a árvore aplica <b>rotações</b> (simples ou duplas) para se reequilibrar, garantindo complexidade O(log n).</p>
+<h3>1.3. Árvore Rubro-Negra (Red-Black)</h3>
+<p>Outra árvore auto-balanceável, mas com critérios menos rígidos que a AVL. Ela utiliza <b>cores (Vermelho/Preto)</b> nos nós e um conjunto de 5 propriedades para garantir que o caminho mais longo da raiz a uma folha não seja mais que o dobro do caminho mais curto. Isso resulta em menos rotações durante inserções/remoções, tornando-a ideal para aplicações com muitas escritas.</p>
+<hr>
+<h2>2. Implementação e Funções Principais</h2>
+<p>O projeto foi desenvolvido em <b>Python</b>, utilizando Programação Orientada a Objetos.</p>
+<h3>2.1. Estrutura dos Nós</h3>
+<p>Todos os nós armazenam:</p>
+<ul><li>  `id` (Chave inteira para ordenação)</li></ul>
+<ul><li>  `valor` (Dado associado)</li></ul>
+<ul><li>  `dado_extra` (Categoria opcional)</li></ul>
+<ul><li>  Ponteiros `esquerda` e `direita`</li></ul>
+<h3>2.2. Funções Implementadas</h3>
+<p>Para cada árvore, foram implementadas as operações:</p>
+<ul><li>  <b>Inserir(id, valor):</b> Adiciona um novo nó mantendo as propriedades da árvore.</li></ul>
+<ul><li>  <b>Buscar(id):</b> Retorna o nó e o número de comparações realizadas.</li></ul>
+<ul><li>  <b>Remover(id):</b> Remove o nó e reorganiza a árvore (lidando com sucessores e rebalanceamento).</li></ul>
+<ul><li>  <b>Travessias:</b> Em-ordem (In-order), Pré-ordem e Pós-ordem.</li></ul>
+<ul><li>  <b>Métricas:</b> Cálculo de altura, contagem de nós e rotações.</li></ul>
+<hr>
+<h2>3. Análise de Complexidade</h2>
+<p>A tabela abaixo resume a complexidade de tempo (Big O) para as operações:</p>
+<table>
+<tr><th>Estrutura</th><th>Melhor Caso</th><th>Caso Médio</th><th>Pior Caso</th><th>Observação</th></tr>
+<tr><td><b>BST</b></td><td>O(log n)</td><td>O(log n)</td><td><b>O(n)</b></td><td>Degenera com dados ordenados.</td></tr>
+<tr><td><b>AVL</b></td><td>O(log n)</td><td>O(log n)</td><td><b>O(log n)</b></td><td>Estritamente balanceada.</td></tr>
+<tr><td><b>Rubro-Negra</b></td><td>O(log n)</td><td>O(log n)</td><td><b>O(log n)</b></td><td>Balanceamento pragmático.</td></tr>
+</table>
+<hr>
+<h2>4. Resultados Experimentais</h2>
+<p>Os testes foram realizados com conjuntos de dados de <b>100, 1.000 e 10.000</b> elementos, gerados aleatoriamente.</p>
+<p>*(Nota: Insira aqui os gráficos gerados pelo Benchmark ou a tabela do CSV)*</p>
+<p><b>Observações dos Testes:</b></p>
+<p>1.  <b>Inserção:</b> A BST é a mais rápida com dados aleatórios (menos overhead), mas a Rubro-Negra supera a AVL por fazer menos rotações.</p>
+<p>2.  <b>Busca:</b> A AVL tende a ser levemente mais rápida que a Rubro-Negra em grandes volumes, pois sua altura é estritamente menor.</p>
+<p>3.  <b>Pior Caso:</b> Ao inserir dados já ordenados (1, 2, 3...), a BST teve desempenho catastrófico (O(n)), enquanto AVL e Rubro-Negra mantiveram O(log n).</p>
+<hr>
+<h2>5. Conclusão</h2>
+<p>A análise comparativa permite concluir que:</p>
+<ul><li>  <b>BST</b> é adequada apenas para dados puramente aleatórios e onde a simplicidade de implementação é prioritária. Seu risco de degeneração a torna inviável para sistemas críticos.</li></ul>
+<ul><li>  <b>AVL</b> é a melhor escolha para cenários com <b>muitas buscas e poucas alterações</b> (ex: dicionários, índices estáticos), devido ao seu balanceamento rígido que otimiza a leitura.</li></ul>
+<ul><li>  <b>Rubro-Negra</b> é a melhor opção para <b>uso geral</b> (ex: `TreeMap` do Java, `std::map` do C++), pois oferece um excelente compromisso entre velocidade de busca e custo de atualização (rotações).</li></ul>
+<hr>
+<h2>6. Anexos: Trechos de Código</h2>
+<h3>6.1. Rotação na AVL</h3>
+<pre>
+def rotacionar_direita(self, y):
+    x = y.esquerda
+    T2 = x.direita
+    x.direita = y
+    y.esquerda = T2
+    y.altura = 1 + max(self.obter_altura_no(y.esquerda), self.obter_altura_no(y.direita))
+    x.altura = 1 + max(self.obter_altura_no(x.esquerda), self.obter_altura_no(x.direita))
+    return x
+</pre>
+<h3>6.2. Propriedades da Rubro-Negra (Inserção)</h3>
+<pre>
+def _consertar_insercao(self, k):
+    while k.pai.cor == "VERMELHO":
+        if k.pai == k.pai.pai.direita:
+            u = k.pai.pai.esquerda # Tio
+            if u.cor == "VERMELHO":
+                u.cor = "PRETO"
+                k.pai.cor = "PRETO"
+                k.pai.pai.cor = "VERMELHO"
+                k = k.pai.pai
+            else:
+                # ... Rotações ...
+</pre>
+<p>*(Nota: Adicione aqui os prints da tela do programa em execução)*</p>
+</body></html>

@@ -9,9 +9,11 @@ class NoAVL:
 
 class ArvoreAVL:
     def __init__(self):
-        self.raiz = None
-        self.comparacoes = 0
-        self.rotacoes = 0
+        # 'self' é como se fosse o "EU" da árvore.
+        # Quando criamos uma árvore nova (arvore = ArvoreAVL()), o 'self' é essa árvore específica.
+        self.raiz = None        # Começa vazia
+        self.comparacoes = 0    # Contador para o benchmark
+        self.rotacoes = 0       # Contador de rotações (o custo do equilíbrio)
 
     def obter_altura_no(self, no):
         if not no:
@@ -50,11 +52,24 @@ class ArvoreAVL:
         return y
 
     def inserir(self, id, valor, dado_extra=None):
+        """
+        Função PÚBLICA: É a porta de entrada.
+        Quem usa a classe só chama arvore.inserir(10, "A").
+        Ela prepara o terreno (zera contadores) e chama a função recursiva que faz o trabalho pesado.
+        """
         self.comparacoes = 0
         self.raiz = self._inserir_recursivo(self.raiz, id, valor, dado_extra)
         return self.comparacoes
 
     def _inserir_recursivo(self, no, id, valor, dado_extra):
+        """
+        Função PRIVADA (começa com _): Faz a mágica da recursão.
+        
+        A recursão funciona assim:
+        1. Se o nó atual é None (chegamos no fim), cria o novo nó aqui!
+        2. Se não, decide se vai para esquerda (menor) ou direita (maior).
+        3. Na volta da recursão (desempilhando), verifica o balanceamento e rotaciona se precisar.
+        """
         self.comparacoes += 1
         if not no:
             return NoAVL(id, valor, dado_extra)
@@ -91,10 +106,20 @@ class ArvoreAVL:
         return no
 
     def buscar(self, id):
+        """
+        Função PÚBLICA: Busca um nó pelo ID.
+        Retorna o nó encontrado e o número de comparações feitas.
+        """
         self.comparacoes = 0
         return self._buscar_recursivo(self.raiz, id)
 
     def _buscar_recursivo(self, no, id):
+        """
+        Função PRIVADA: Navega pela árvore (Busca Binária).
+        - Se ID procurado == ID do nó: Achou!
+        - Se ID procurado < ID do nó: Vai para a esquerda.
+        - Se ID procurado > ID do nó: Vai para a direita.
+        """
         if no is None:
             return None, self.comparacoes
         
@@ -107,11 +132,28 @@ class ArvoreAVL:
             return self._buscar_recursivo(no.direita, id)
 
     def remover(self, id):
+        """
+        Função PÚBLICA: Remove um nó pelo ID.
+        Assim como a inserção, ela chama a recursiva e atualiza a raiz.
+        """
         self.comparacoes = 0
         self.raiz = self._remover_recursivo(self.raiz, id)
         return self.comparacoes
 
     def _remover_recursivo(self, no, id):
+        """
+        Função PRIVADA: Remove e rebalanceia.
+        
+        Passo 1: Achar o nó (igual na busca).
+        Passo 2: Remover (3 casos):
+            - Nó folha (sem filhos): Só apaga.
+            - 1 Filho: O filho sobe para o lugar do pai.
+            - 2 Filhos: Pega o menor valor da direita (sucessor), coloca no lugar e apaga o sucessor antigo.
+        Passo 3: Rebalancear (A mágica da AVL):
+            - Recalcula altura.
+            - Verifica se desbalanceou.
+            - Aplica rotações se necessário.
+        """
         if not no:
             return no
 
@@ -121,11 +163,13 @@ class ArvoreAVL:
         elif id > no.id:
             no.direita = self._remover_recursivo(no.direita, id)
         else:
+            # Achou o nó para remover!
             if no.esquerda is None:
                 return no.direita
             elif no.direita is None:
                 return no.esquerda
             
+            # Caso com 2 filhos: Pega o sucessor (menor da direita)
             temp = self._no_valor_minimo(no.direita)
             no.id = temp.id
             no.valor = temp.valor
@@ -134,9 +178,11 @@ class ArvoreAVL:
         if no is None:
             return no
 
+        # Atualiza altura
         no.altura = 1 + max(self.obter_altura_no(no.esquerda), self.obter_altura_no(no.direita))
         balanceamento = self.obter_balanceamento(no)
 
+        # Rebalanceamento (Rotações)
         # Caso Esquerda Esquerda
         if balanceamento > 1 and self.obter_balanceamento(no.esquerda) >= 0:
             return self.rotacionar_direita(no)

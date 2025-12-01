@@ -9,7 +9,7 @@ def gerar_string_aleatoria(tamanho=8):
 
 def gerar_valor_numerico():
     """Gera um valor numérico aleatório como string."""
-    return str(random.randint(100, 99999))
+    return str(random.randint(1, 999))
 
 def gerar_dados_aleatorios(tamanho, min_val=0, max_val=100000):
     """Gera uma lista de dicionários com ID único, valor numérico (str) e categoria aleatória."""

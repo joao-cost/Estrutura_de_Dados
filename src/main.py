@@ -20,7 +20,7 @@ def executar_benchmark(tamanhos=[100, 1000, 10000]):
         dados_aleatorios = gerar_dados_aleatorios(tamanho)
         dados_ordenados = gerar_dados_ordenados(tamanho)
         
-        conjuntos_dados = {"Aleatorio": dados_aleatorios, "Ordenado": dados_ordenados}
+        conjuntos_dados = {"Aleatório": dados_aleatorios, "Ordenado": dados_ordenados}
         
         for tipo_dado, dados in conjuntos_dados.items():
             # Árvores
@@ -67,16 +67,16 @@ def executar_benchmark(tamanhos=[100, 1000, 10000]):
                 resultados.append({
                     "Tamanho": tamanho,
                     "Tipo de Dado": tipo_dado,
-                    "Arvore": nome_arvore,
-                    "Tempo Insercao (ms)": round(tempo_insercao_ms, 4),
-                    "Comparacoes Medias Insercao": round(total_comparacoes_insercao / tamanho, 2),
+                    "Árvore": nome_arvore,
+                    "Tempo Inserção (ms)": round(tempo_insercao_ms, 4),
+                    "Comparações Médias Inserção": round(total_comparacoes_insercao / tamanho, 2),
                     "Tempo Busca (ms)": round(tempo_busca_ms, 4),
-                    "Comparacoes Medias Busca": round(total_comparacoes_busca / tamanho, 2),
-                    "Tempo Remocao (ms)": round(tempo_remocao_ms, 4),
-                    "Comparacoes Medias Remocao": round(total_comparacoes_remocao / (tamanho//2), 2),
+                    "Comparações Médias Busca": round(total_comparacoes_busca / tamanho, 2),
+                    "Tempo Remoção (ms)": round(tempo_remocao_ms, 4),
+                    "Comparações Médias Remoção": round(total_comparacoes_remocao / (tamanho//2), 2),
                     "Altura Final": altura_final,
-                    "Total Nos": contagem_nos,
-                    "Rotacoes": rotacoes
+                    "Total Nós": contagem_nos,
+                    "Rotações": rotacoes
                 })
 
     df = pd.DataFrame(resultados)
@@ -84,10 +84,10 @@ def executar_benchmark(tamanhos=[100, 1000, 10000]):
     print(df)
     
     # Salvar em CSV
-    if not os.path.exists("../report"):
-        os.makedirs("../report")
-    df.to_csv("../report/resultados_benchmark.csv", index=False)
-    print("\nResultados salvos em ../report/resultados_benchmark.csv")
+    if not os.path.exists("report"):
+        os.makedirs("report")
+    df.to_csv("report/resultados_benchmark.csv", index=False)
+    print("\nResultados salvos em report/resultados_benchmark.csv")
 
 if __name__ == "__main__":
     executar_benchmark()
