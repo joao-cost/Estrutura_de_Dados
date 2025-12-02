@@ -258,7 +258,7 @@ if modo == "Apresentação (Slides)":
 
     elif slide_atual == "Desmistificando Big O":
         st.header("🧐 O que é esse tal de Big O?")
-        st.subheader("Uma explicação para humanos (sem matematiquês)")
+        st.subheader("Uma explicação simples")
 
         col_analogia, col_arvore = st.columns(2)
         
